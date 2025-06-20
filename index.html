@@ -191,116 +191,108 @@
     <span class="heart">♥️</span><span class="heart">♥️</span><span class="heart">♥️</span>
   </footer>
   <script>
-    const passwordDisplay = document.getElementById('passwordDisplay');
-    const keys = document.querySelectorAll('.key');
-    const submitBtn = document.getElementById('submitBtn');
-    const welcomeMessage = document.getElementById('welcomeMessage');
-    const sectionsContainer = document.getElementById('sectionsContainer');
-    const passwordSection = document.getElementById('passwordSection');
+window.addEventListener('DOMContentLoaded', () => {
+  const passwordDisplay = document.getElementById('passwordDisplay');
+  const keys = document.querySelectorAll('.key');
+  const submitBtn = document.getElementById('submitBtn');
+  const welcomeMessage = document.getElementById('welcomeMessage');
+  const sectionsContainer = document.getElementById('sectionsContainer');
+  const passwordSection = document.getElementById('passwordSection');
+  const salidasBtn = document.getElementById('salidasBtn');
+  const salidasGallery = document.getElementById('salidasGallery');
+  const uploadBtn = document.getElementById('uploadImagesBtn');
+  const galleryContainer = document.getElementById('salidasGalleryContainer');
 
-    let password = '';
-    keys.forEach(key => {
-      key.addEventListener('click', () => {
-        const keyValue = key.getAttribute('data-key');
-        if (key.classList.contains('delete')) {
-          password = password.slice(0, -1);
-        } else if (key.classList.contains('clear')) {
-          password = '';
-        } else if (keyValue && password.length < 6) {
-          password += keyValue;
-        }
-        passwordDisplay.textContent = '*'.repeat(password.length);
-      });
-    });
-
-    submitBtn.addEventListener('click', () => {
-      if (password === '030122') {
-        passwordSection.style.display = 'none';
-        welcomeMessage.style.display = 'block';
-        sectionsContainer.style.display = 'flex';
-      } else {
-        alert('Contraseña incorrecta. Intenta de nuevo ❤️');
+  let password = '';
+  keys.forEach(key => {
+    key.addEventListener('click', () => {
+      const keyValue = key.getAttribute('data-key');
+      if (key.classList.contains('delete')) {
+        password = password.slice(0, -1);
+      } else if (key.classList.contains('clear')) {
+        password = '';
+      } else if (keyValue && password.length < 6) {
+        password += keyValue;
       }
-      password = '';
-      passwordDisplay.textContent = '';
+      passwordDisplay.textContent = '*'.repeat(password.length);
     });
+  });
 
-    const uploadBtn = document.getElementById('uploadImagesBtn');
-    const galleryContainer = document.getElementById('salidasGalleryContainer');
-    const salidasBtn = document.getElementById('salidasBtn');
-    const salidasGallery = document.getElementById('salidasGallery');
-
-    const cloudName = 'dlchy81nh';
-    const tag = 'salidas';
-
-    function mostrarArchivo(url, mime) {
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.download = '';
-      const el = mime.includes('video') ? document.createElement('video') : document.createElement('img');
-      el.src = url;
-      el.style.width = '180px';
-      el.style.height = '180px';
-      el.style.objectFit = 'cover';
-      el.style.borderRadius = '15px';
-      el.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
-      if (mime.includes('video')) el.controls = true;
-      a.appendChild(el);
-      galleryContainer.appendChild(a);
+  submitBtn.addEventListener('click', () => {
+    if (password === '030122') {cargarImagenesPorEtiqueta();
+      passwordSection.style.display = 'none';
+      welcomeMessage.style.display = 'block';
+      sectionsContainer.style.display = 'flex';
+    } else {
+      alert('Contraseña incorrecta. Intenta de nuevo ❤️');
     }
+    password = '';
+    passwordDisplay.textContent = '';
+  });
 
-    uploadBtn.addEventListener('click', () => {
-      cloudinary.openUploadWidget({
-        cloudName: cloudName,
-        uploadPreset: 'unsigned_preset',
-        sources: ['local', 'camera'],
-        multiple: true,
-        resourceType: 'auto',
-        tags: [tag]
-      }, (error, result) => {
-        if (!error && result && result.event === "success") {
-          const url = result.info.secure_url;
-          const mime = result.info.resource_type === 'video' ? 'video/mp4' : 'image/jpeg';
-          mostrarArchivo(url, mime);
-        }
-      });
-    });
+  const cloudName = 'dlchy81nh';
+  const tag = 'salidas';
 
-    salidasBtn.addEventListener('click', () => {
-      sectionsContainer.style.display = 'none';
-      salidasGallery.style.display = 'block';
-      welcomeMessage.style.display = 'none';
-      cargarImagenesPorEtiqueta();
-    });
+  function mostrarArchivo(url, mime) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.download = '';
+    const el = mime.includes('video') ? document.createElement('video') : document.createElement('img');
+    el.src = url;
+    el.style.width = '180px';
+    el.style.height = '180px';
+    el.style.objectFit = 'cover';
+    el.style.borderRadius = '15px';
+    el.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+    if (mime.includes('video')) el.controls = true;
+    a.appendChild(el);
+    galleryContainer.appendChild(a);
+  }
 
-    async function cargarImagenesPorEtiqueta() {
-      galleryContainer.innerHTML = '';
-
-      const endpoints = [
-        `https://res.cloudinary.com/${cloudName}/image/list/${tag}.json`,
-        `https://res.cloudinary.com/${cloudName}/video/list/${tag}.json`
-      ];
-
-      for (const endpoint of endpoints) {
-        try {
-          const res = await fetch(endpoint);
-          const data = await res.json();
-
-          data.resources.forEach(item => {
-            const mime = endpoint.includes('/video/') ? 'video/mp4' : 'image/jpeg';
-            const mediaUrl = `https://res.cloudinary.com/${cloudName}/${mime.startsWith('video') ? 'video' : 'image'}/upload/${item.public_id}.${item.format}`;
-            mostrarArchivo(mediaUrl, mime);
-          });
-        } catch (err) {
-          console.warn("No se pudo cargar desde:", endpoint, err);
-        }
+  uploadBtn.addEventListener('click', () => {
+    cloudinary.openUploadWidget({
+      cloudName: cloudName,
+      uploadPreset: 'unsigned_preset',
+      sources: ['local', 'camera'],
+      multiple: true,
+      resourceType: 'auto',
+      tags: [tag]
+    }, (error, result) => {
+      if (!error && result && result.event === "success") {
+        const url = result.info.secure_url;
+        const mime = result.info.resource_type === 'video' ? 'video/mp4' : 'image/jpeg';
+        mostrarArchivo(url, mime);
       }
+    });
+  });
 
-      if (!galleryContainer.children.length) {
-        galleryContainer.innerHTML = '<p style="color:#b0003a;">No se encontraron imágenes ni videos 🌸</p>';
-      }
-    }
-  </script>
+  salidasBtn.addEventListener('click', () => {
+    sectionsContainer.style.display = 'none';
+    salidasGallery.style.display = 'block';
+    welcomeMessage.style.display = 'none';
+    cargarImagenesPorEtiqueta();
+  });
+
+  async function cargarImagenesPorEtiqueta() {
+  galleryContainer.innerHTML = '';
+
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/resources/search`;
+  const query = `expression=tags:${tag}&max_results=100`;
+
+  try {
+    const res = await fetch(`${url}?${query}`);
+    const data = await res.json();
+    data.resources.forEach(item => {
+      const mime = item.resource_type === 'video' ? 'video/mp4' : 'image/jpeg';
+      mostrarArchivo(item.secure_url, mime);
+    });
+  } catch (err) {
+    console.warn("No se pudo cargar desde Cloudinary", err);
+    galleryContainer.innerHTML = '<p style="color:#b0003a;">No se encontraron imágenes ni videos 🌸</p>';
+  }
+}
+});
+</script>
 </body>
 </html>
