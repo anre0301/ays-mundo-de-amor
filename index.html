@@ -174,7 +174,7 @@
 
     <p id="welcomeMessage">Bienvenido al mundo A ♥️ C</p>
 
-    <div id="sectionsContainer" style="display: none;">
+    <div id="sectionsContainer" style="display: none; flex-direction: column; align-items: center;">
       <div class="section" id="salidasBtn">
         <h2>SALIDAS</h2>
         <p>Momentos especiales para compartir juntos y disfrutar de la compañía.</p>
@@ -225,8 +225,11 @@
       passwordDisplay.textContent = '';
     });
 
-   const uploadBtn = document.getElementById('uploadImagesBtn');
+    const uploadBtn = document.getElementById('uploadImagesBtn');
     const galleryContainer = document.getElementById('salidasGalleryContainer');
+    const salidasBtn = document.getElementById('salidasBtn');
+    const salidasGallery = document.getElementById('salidasGallery');
+
     const cloudName = 'dlchy81nh';
     const tag = 'salidas';
 
@@ -264,6 +267,13 @@
       });
     });
 
+    salidasBtn.addEventListener('click', () => {
+      sectionsContainer.style.display = 'none';
+      salidasGallery.style.display = 'block';
+      welcomeMessage.style.display = 'none';
+      cargarImagenesPorEtiqueta();
+    });
+
     async function cargarImagenesPorEtiqueta() {
       galleryContainer.innerHTML = '';
 
@@ -291,8 +301,6 @@
         galleryContainer.innerHTML = '<p style="color:#b0003a;">No se encontraron imágenes ni videos 🌸</p>';
       }
     }
-
-    window.onload = cargarImagenesPorEtiqueta;
   </script>
 </body>
 </html>
