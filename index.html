@@ -265,7 +265,7 @@
       const data = await res.json();
       galleryContainer.innerHTML = '';
       const archivos = data.resources.map(item => ({
-        url: `https://res.cloudinary.com/${cloudName}/image/upload/${item.public_id}.${item.format}`,
+        url: `https://res.cloudinary.com/${cloudName}/media/upload/${item.public_id}.${item.format}`,
         mime: 'image/jpeg' // se puede mejorar si quieres detectar video
       }));
       archivos.forEach(({ url, mime }) => mostrarArchivo(url, mime));
@@ -275,20 +275,32 @@
     }
   }
 
-  function mostrarArchivo(url, mime) {
-    const a = document.createElement('a');
-    a.href = url;
-    a.target = '_blank';
-    a.download = '';
-    const el = mime.includes('video') ? document.createElement('video') : document.createElement('img');
-    el.src = url;
-    el.style.width = '180px';
-    el.style.height = '180px';
-    el.style.objectFit = 'cover';
-    el.style.borderRadius = '15px';
-    el.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
-    if (mime.includes('video')) el.controls = true;
-    a.appendChild(el);
-    galleryContainer.appendChild(a);
+  async function cargarImagenesPorEtiqueta() {
+  galleryContainer.innerHTML = '';
+
+  const endpoints = [
+    `https://res.cloudinary.com/${cloudName}/image/list/${tag}.json`,
+    `https://res.cloudinary.com/${cloudName}/video/list/${tag}.json`
+  ];
+
+  for (const endpoint of endpoints) {
+    try {
+      const res = await fetch(endpoint);
+      const data = await res.json();
+
+      data.resources.forEach(item => {
+        const mime = endpoint.includes('/video/') ? 'video/mp4' : 'image/jpeg';
+        const mediaUrl = `https://res.cloudinary.com/${cloudName}/${mime.startsWith('video') ? 'video' : 'image'}/upload/${item.public_id}.${item.format}`;
+        mostrarArchivo(mediaUrl, mime);
+      });
+    } catch (err) {
+      console.warn("No se pudo cargar desde:", endpoint, err);
+    }
   }
+
+  if (!galleryContainer.children.length) {
+    galleryContainer.innerHTML = '<p style="color:#b0003a;">No se encontraron imágenes ni videos 🌸</p>';
+  }
+}
+
 </script>
