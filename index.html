@@ -259,7 +259,7 @@
   });
 
   async function cargarImagenesDesdeCloudinary() {
-    const url = `https://res.cloudinary.com/${cloudName}/image/list/${tag}.json`;
+    const url = `https://res.cloudinary.com/${cloudName}/media/list/${tag}.json`;
     try {
       const res = await fetch(url);
       const data = await res.json();
