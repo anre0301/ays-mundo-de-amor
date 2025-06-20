@@ -225,55 +225,70 @@
       passwordDisplay.textContent = '';
     });
 
-    const galleryContainer = document.getElementById('salidasGalleryContainer');
-    const salidasBtn = document.getElementById('salidasBtn');
-    const uploadBtn = document.getElementById('uploadImagesBtn');
-    const salidasGallery = document.getElementById('salidasGallery');
+  const galleryContainer = document.getElementById('salidasGalleryContainer');
+  const salidasBtn = document.getElementById('salidasBtn');
+  const uploadBtn = document.getElementById('uploadImagesBtn');
+  const salidasGallery = document.getElementById('salidasGallery');
 
-    salidasBtn.addEventListener('click', () => {
-      sectionsContainer.style.display = 'none';
-      salidasGallery.style.display = 'block';
-      welcomeMessage.style.display = 'none';
+  const cloudName = 'dlchy81nh';
+  const tag = 'salidas';
+
+  salidasBtn.addEventListener('click', () => {
+    sectionsContainer.style.display = 'none';
+    salidasGallery.style.display = 'block';
+    welcomeMessage.style.display = 'none';
+    cargarImagenesDesdeCloudinary(); // carga desde Cloudinary
+  });
+
+  uploadBtn.addEventListener('click', () => {
+    cloudinary.openUploadWidget({
+      cloudName: cloudName,
+      uploadPreset: 'unsigned_preset',
+      sources: ['local', 'camera'],
+      multiple: true,
+      resourceType: 'auto',
+      tags: [tag] // etiqueta para que luego podamos encontrarlas
+    }, (error, result) => {
+      if (!error && result && result.event === "success") {
+        const url = result.info.secure_url;
+        const mime = result.info.resource_type === 'video' ? 'video/mp4' : 'image/jpeg';
+        const nueva = { url, mime };
+        mostrarArchivo(url, mime);
+      }
     });
+  });
 
-    const stored = JSON.parse(localStorage.getItem('media') || '[]');
-    stored.forEach(({url, mime}) => mostrarArchivo(url, mime));
-
-    uploadBtn.addEventListener('click', () => {
-      cloudinary.openUploadWidget({
-        cloudName: 'dlchy81nh',
-        uploadPreset: 'unsigned_preset',
-        sources: ['local', 'camera'],
-        multiple: true,
-        resourceType: 'auto'
-      }, (error, result) => {
-        if (!error && result && result.event === "success") {
-          const url = result.info.secure_url;
-          const mime = result.info.resource_type === 'video' ? 'video/mp4' : 'image/jpeg';
-          const prev = JSON.parse(localStorage.getItem('media') || '[]');
-          const nueva = { url, mime };
-          localStorage.setItem('media', JSON.stringify([...prev, nueva]));
-          mostrarArchivo(url, mime);
-        }
-      });
-    });
-
-    function mostrarArchivo(url, mime) {
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.download = '';
-      const el = mime.includes('video') ? document.createElement('video') : document.createElement('img');
-      el.src = url;
-      el.style.width = '180px';
-      el.style.height = '180px';
-      el.style.objectFit = 'cover';
-      el.style.borderRadius = '15px';
-      el.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
-      if (mime.includes('video')) el.controls = true;
-      a.appendChild(el);
-      galleryContainer.appendChild(a);
+  async function cargarImagenesDesdeCloudinary() {
+    const url = `https://res.cloudinary.com/${cloudName}/image/list/${tag}.json`;
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      galleryContainer.innerHTML = '';
+      const archivos = data.resources.map(item => ({
+        url: `https://res.cloudinary.com/${cloudName}/image/upload/${item.public_id}.${item.format}`,
+        mime: 'image/jpeg' // se puede mejorar si quieres detectar video
+      }));
+      archivos.forEach(({ url, mime }) => mostrarArchivo(url, mime));
+    } catch (err) {
+      console.error('❌ Error al cargar imágenes desde Cloudinary:', err);
+      galleryContainer.innerHTML = '<p style="color:#b0003a;">No se pudieron cargar las imágenes 🌸</p>';
     }
-  </script>
-</body>
-</html>
+  }
+
+  function mostrarArchivo(url, mime) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.download = '';
+    const el = mime.includes('video') ? document.createElement('video') : document.createElement('img');
+    el.src = url;
+    el.style.width = '180px';
+    el.style.height = '180px';
+    el.style.objectFit = 'cover';
+    el.style.borderRadius = '15px';
+    el.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+    if (mime.includes('video')) el.controls = true;
+    a.appendChild(el);
+    galleryContainer.appendChild(a);
+  }
+</script>
