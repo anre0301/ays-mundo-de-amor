@@ -386,15 +386,16 @@
         <h2>RECUERDOS INNOLVIDABLES (FOTOS Y VIDEOS)</h2>
       </div>
     </div>
-    <div id="salidasGallery" style="padding-top: 10px; position: relative;">
-  <!-- Botón Atrás fijo en esquina superior izquierda del recuadro blanco -->
-  <button id="backBtn" class="viewerBtn" style="position: absolute; top: 15px; left: 15px; z-index: 2;">🔙 Atrás</button>
-
-  <!-- Formulario con botón centrado -->
-  <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" style="display: flex; justify-content: center; margin-top: 5px; margin-bottom: 20px;">
+<div id="salidasGallery" style="padding-top: 10px; display: none; position: relative;">
+  <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 20px; width: 100%;">
+  <button id="backBtn" class="viewerBtn" style="margin-left: 10px;">🔙 Atrás</button>
+  <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" style="margin: 0 auto;">
     <label for="fileInput" class="customFileBtn">📷 Seleccionar Imagen</label>
     <input id="fileInput" type="file" name="file" accept="image/*,video/*" required hidden>
   </form>
+</div>
+
+
   <div id="salidasGalleryContainer" class="gallery" style="margin-top: 30px;">
     {% for foto in fotos %}
       {% set ext = foto.split('.')[-1].lower() %}
@@ -406,7 +407,6 @@
     {% endfor %}
   </div>
 </div>
-
   </div>
 
   <div id="viewerModal">
@@ -552,10 +552,10 @@
 });
     
     salidasBtn.addEventListener('click', () => {
-      sectionsContainer.style.display = 'none';
-      salidasGallery.style.display = 'block';
-      welcomeMessage.style.display = 'none';
-    });
+  sectionsContainer.style.display = 'none';
+  salidasGallery.style.display = 'block';
+  welcomeMessage.style.display = 'none';
+});
 
     const fileInput = document.getElementById('fileInput');
     const uploadForm = document.getElementById('uploadForm');
