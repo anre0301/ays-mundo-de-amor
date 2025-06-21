@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Mi Espacio A♥S - Salidas Especiales</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -292,6 +292,71 @@
   transform: scale(1.05);
   background: linear-gradient(145deg, #f48fb1, #d81b60);
 }
+@media (max-width: 600px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  .container {
+    width: 100%;
+    padding: 20px 15px;
+  }
+
+  .gallery {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .gallery img, .gallery video {
+    width: 100%;
+    height: auto;
+  }
+
+  .keypad {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .key {
+    font-size: 1.8rem;
+    padding: 15px 0;
+  }
+
+  #submitBtn {
+    font-size: 1.3rem;
+    padding: 12px 30px;
+  }
+
+  .section h2 {
+    font-size: 1.5rem;
+  }
+
+  .section p {
+    font-size: 1rem;
+  }
+
+  .viewerButtons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .viewerBtn {
+    width: 90%;
+    font-size: 1.1rem;
+  }
+
+  footer {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  #backBtn {
+    top: 10px;
+    left: 10px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+  }
+}
   </style>
 </head>
 <body>
@@ -451,35 +516,41 @@
     const salidasBtn = document.getElementById('salidasBtn');
     const salidasGallery = document.getElementById('salidasGallery');
 
-    let password = '';
-    keys.forEach(key => {
-      key.addEventListener('click', () => {
-        const keyValue = key.getAttribute('data-key');
-        if (key.classList.contains('delete')) {
-          password = password.slice(0, -1);
-        } else if (key.classList.contains('clear')) {
-          password = '';
-        } else if (keyValue && password.length < 6) {
-          password += keyValue;
-        }
-        passwordDisplay.textContent = '*'.repeat(password.length);
-      });
-    });
+    document.addEventListener('DOMContentLoaded', () => {
+  const passwordDisplay = document.getElementById('passwordDisplay');
+  const keys = document.querySelectorAll('.key');
+  let password = '';
 
-    submitBtn.addEventListener('click', () => {
-      if (password === '030122') {
-  localStorage.setItem('accesoPermitido', 'true');  // ✅ Guardamos permiso
-  passwordSection.style.display = 'none';
-  welcomeMessage.style.display = 'block';
-  sectionsContainer.style.display = 'flex';
-}
- else {
-        alert('Contraseña incorrecta. Intenta de nuevo ❤️');
+  keys.forEach(key => {
+    key.addEventListener('click', () => {
+      const keyValue = key.getAttribute('data-key');
+      if (key.classList.contains('delete')) {
+        password = password.slice(0, -1);
+      } else if (key.classList.contains('clear')) {
+        password = '';
+      } else if (keyValue && password.length < 6) {
+        password += keyValue;
       }
-      password = '';
-      passwordDisplay.textContent = '';
+      passwordDisplay.textContent = '*'.repeat(password.length);
     });
+  });
 
+  // ✨ AGREGA ESTE CÓDIGO DENTRO del bloque DOMContentLoaded:
+  document.getElementById('submitBtn').addEventListener('click', () => {
+    if (password === '030122') {
+      localStorage.setItem('accesoPermitido', 'true');
+      document.getElementById('passwordSection').style.display = 'none';
+      document.getElementById('welcomeMessage').style.display = 'block';
+      document.getElementById('sectionsContainer').style.display = 'flex';
+    } else {
+      alert('Contraseña incorrecta. Intenta de nuevo ❤️');
+    }
+    password = '';
+    passwordDisplay.textContent = '';
+  });
+
+});
+    
     salidasBtn.addEventListener('click', () => {
       sectionsContainer.style.display = 'none';
       salidasGallery.style.display = 'block';
@@ -511,6 +582,26 @@
   }
 });
   </script>
+  <script>
+  document.addEventListener('touchstart', function (e) {
+    if (e.touches.length > 1) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  // 🔒 Evita doble tap zoom fuera de botones
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', function (e) {
+    const now = new Date().getTime();
+    const allowTap = e.target.closest('button, .key, input, label, .section');
+
+    if (!allowTap && now - lastTouchEnd <= 300) {
+      e.preventDefault();
+    }
+
+    lastTouchEnd = now;
+  }, false);
+</script>
   <div class="floating-hearts">
   <div class="heart" style="left: 20%; animation-delay: 0s;"></div>
   <div class="heart" style="left: 40%; animation-delay: 2s;"></div>
